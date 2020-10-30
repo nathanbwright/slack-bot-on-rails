@@ -1,4 +1,6 @@
 class CannonController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
   def create 
     resp = Net::HTTP.get(uri)
     hash = JSON.parse(resp)
@@ -17,10 +19,6 @@ class CannonController < ApplicationController
   end
 
   private
-
-  def params
-    params.permit[:query, :limit]
-  end
 
   def uri 
     host = 'https://api.giphy.com'
