@@ -13,7 +13,7 @@ class CannonController < ApplicationController
         }
     end.uniq
 
-    render json: { blocks: response_array }
+    render json: { blocks: response_array, response_type: "in_channel" }
   end
 
   private
