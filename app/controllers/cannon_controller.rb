@@ -3,9 +3,9 @@ class CannonController < ApplicationController
     resp = Net::HTTP.get(uri)
     hash = JSON.parse(resp)
     image_urls = []
-    response_array = hash['data'].map do |i|
+    response_array = hash['data'].flat_map do |i|
       image_urls << i['images']['original']['url']
-    end
+    end.uniq
     render json: { responses: response_array }
   end
 
