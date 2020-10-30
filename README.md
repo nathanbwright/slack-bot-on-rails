@@ -1,41 +1,69 @@
-Slack-Bot-On-Rails
-==================
+# README
 
-[![Build Status](https://travis-ci.org/slack-ruby/slack-bot-on-rails.svg?branch=master)](https://travis-ci.org/slack-ruby/slack-bot-on-rails)
+## Installation
 
-### What's this?
+### Create Your Slack App (optional)
 
-A slack bot that responds to `say`, running on Rails with a React front-end that displays messages.
+1. https://api.slack.com/apps
+1. Click the button:
 
-### Run Me
+    ![Create New App](readme/create-new-app.png)
+1. Fill and submit the form:
 
-In Slack administration create a new Bot Integration under [services/new/bot](http://slack.com/services/new/bot). On the next screen note the Slack API token.
-
-
-```
-bundle install
-
-SLACK_API_TOKEN="your token here" rails s
-```
-
-Navigate to http://localhost:3000.
-
-Invite the bot to a channel, then ask it to `say hi`.
-
-![](tattletale.gif)
+    ![Create Slack App](readme/create-slack-app.png)
+1. In your console, `bundle exec rails credentials:edit`, then update the secrets from the App Credentials section.
 
 ### Deploy to Heroku
 
-Hit the button below and update the `SLACK_API_TOKEN` config variable with your [token](http://slack.com/services/new/bot)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/oddballteam/slack-bot-on-rails)
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/dblock/slack-bot-on-rails)
+### Update Slack App Configuration
 
-### Implementation Details
+1. https://api.slack.com/apps
+1. Click your new app
+1. Click Event Subscriptions
+    * Enable Events: On
+    * Request URL: https://your-heroku-app.herokuapp.com/teams/create
+    * Subscribe to bot events:
+        * app_home_opened
+        * app_mention
+        * app_mentions:read
+        * app_uninstalled
+        * tokens_revoked
+1. Click Oauth & Permissions
+    * Click Add New Redirect URL, enter: https://your-heroku-app.herokuapp.com/teams/create
 
-1. A vanilla Rails app created via `rails new slack-bot-on-rails --skip-activerecord -T`, in [@d092f4ed](https://github.com/dblock/slack-bot-on-rails/commit/d092f4ed7f16aee27cdfde837a3a420df182f81a).
-2. A slack-ruby-bot that responds to `say something`, in [@a93877ae](https://github.com/dblock/slack-bot-on-rails/commit/a93877ae77d0fa1935b1c847af61dab346a46b78).
-3. A react app that displays messages sent to Slack, in [@9632e9f1](https://github.com/dblock/slack-bot-on-rails/commit/9632e9f157bc97eab15c5588bc493550eb2ac5ba).
+### Install to Slack Workspace
 
-### Copyright & License
+Then visit https://your-heroku-app.herokuapp.com/teams/new, and click the Add to Slack button.
 
-Copyright [Daniel Doubrovkine](http://code.dblock.org), [MIT License](LICENSE.md).
+## Troubleshooting
+
+### Thread Details Are Not Updating
+
+Using the Rails console (ex: `heroku run rails console`), note the last time the UpdateThreadsRepliesJob was enqueued:
+
+```
+irb> Que::Scheduler::VersionSupport.execute("select * from que_scheduler_audit_enqueued")
+=> [{:scheduler_job_id=>43, :job_class=>"UpdateThreadsRepliesJob", :queue=>"default", :priority=>100, :args=>[], :job_id=>44, :run_at=>2020-09-28 19:00:02 +0000}, {:scheduler_job_id=>134, :job_class=>"UpdateThreadsRepliesJob", :queue=>"default", :priority=>100, :args=>[], :job_id=>135, :run_at=>2020-09-30 15:25:03 +0000}, {:scheduler_job_id=>140, :job_class=>"UpdateThreadsRepliesJob", :queue=>"default", :priority=>100, :args=>[], :job_id=>141, :run_at=>2020-09-30 15:30:00 +0000}]
+```
+
+Next, check the last time the Que Scheduler ran:
+
+```
+irb> Que::Scheduler::VersionSupport.execute("select * from que_scheduler_audit_enqueued")
+=> [{:scheduler_job_id=>20, :executed_at=>2020-09-28 18:38:14 +0000}, {:scheduler_job_id=>21, :executed_at=>2020-09-28 18:39:04 +0000}, {:scheduler_job_id=>22, :executed_at=>2020-09-28 18:40:04 +0000}, {:scheduler_job_id=>23, :executed_at=>2020-09-28 18:41:00 +0000}]
+```
+
+Finally, check that the Que Scheduler job is enqueued:
+
+```
+irb> Que.job_stats
+=> [{:job_class=>"Que::Scheduler::SchedulerJob", :count=>1, :count_working=>1, :count_errored=>0, :highest_error_count=>0, :oldest_run_at=>2020-09-30 15:26:00 +0000}]
+```
+
+If not, enqueue it:
+
+```
+irb> Que::Scheduler::SchedulerJob.enqueue
+```

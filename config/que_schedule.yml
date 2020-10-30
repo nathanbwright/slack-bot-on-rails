@@ -1,0 +1,9 @@
+# see https://github.com/hlascelles/que-scheduler#schedule-configuration
+UpdateThreadsMetadataJob:
+  cron: '*/20 * * * *'
+
+UpdateThreadsRepliesJob:
+  cron: '*/20 * * * *'
+
+UpdateUsersDetailsJob:
+  cron: '*/20 * * * *'
