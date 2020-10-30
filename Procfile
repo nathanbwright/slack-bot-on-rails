@@ -1,3 +1,1 @@
-web: bundle exec puma -C config/puma.rb
-release: rake db:migrate
-worker: bundle exec que
+web: bundle exec rails server -p $PORT
