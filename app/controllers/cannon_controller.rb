@@ -1,5 +1,5 @@
 class CannonController < ApplicationController
-  def index
+  def create 
     resp = Net::HTTP.get(uri)
     hash = JSON.parse(resp)
     image_urls = []
