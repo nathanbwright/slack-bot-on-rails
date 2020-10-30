@@ -6,10 +6,14 @@ class CannonController < ApplicationController
     response_array = hash['data'].flat_map do |i|
       image_urls << i['images']['original']['url']
     end.uniq
-    render json: { responses: response_array }
+    render json: { responses: response_array.first }
   end
 
   private
+
+  def params
+    params.permit[:query, :limit]
+  end
 
   def uri 
     host = 'https://api.giphy.com'
