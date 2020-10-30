@@ -16,7 +16,7 @@ class CannonController < ApplicationController
           accessory: {
             type: "image",
             image_url: i['images']['original']['url'],
-            alt_text: "Katie y u no <3 princess bride?!"
+            alt_text: i['title']
           }
         }
     end.uniq
