@@ -6,8 +6,8 @@ class CannonController < ApplicationController
     response_array = hash['data'].flat_map do |i|
       image_urls << i['images']['original']['url']
     end.uniq
-    # render json: { responses: response_array.firs }
-    render json: { blocks: [], text: "tes" }
+    # render json: { responses: response_array.first }
+    render json: { blocks: [], text: response_array.first }
   end
 
   private
