@@ -7,10 +7,16 @@ class CannonController < ApplicationController
     image_urls = []
     response_array = hash['data'].flat_map do |i|
        { 
-          type: "image",
-          response_type: "in_channel",
-          image: {
-            image_url: i['images']['original']['url']
+          type: "section",
+          response_type: "in_channel", 
+          text: {
+            type: "mrkdwn",
+            text: "Text"
+          },
+          accessory: {
+            type: "image",
+            image_url: i['images']['original']['url'],
+            alt_text: "Katie y u no <3 princess bride?!"
           }
         }
     end.uniq
