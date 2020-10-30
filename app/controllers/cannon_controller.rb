@@ -6,11 +6,12 @@ class CannonController < ApplicationController
     hash = JSON.parse(resp)
     image_urls = []
     response_array = hash['data'].flat_map do |i|
-        {
+       { 
           type: "section",
-          text: {
-            type: "mrkdwn",
-            text: i['images']['original']['url']
+          response_type: "in_channel",
+          image: {
+            type: "image",
+            image_url: i['images']['original']['url']
           }
         }
     end.uniq
